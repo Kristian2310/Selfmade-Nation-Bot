@@ -50,36 +50,37 @@ class Tickets(commands.Cog):
                 "You can't do this!", ephemeral=True
             )
 
-        embed = discord.Embed(
-            title="🎮 IN-GAME ASSISTANCE 🎮",
-            description=(
-                "# CHOOSE YOUR TICKET TYPE🚂 💨\n"
-                "**Pick the ticket type that fits your request📜\n**"
-                "**⁠https://discord.com/channels/1345073229026562079/1358536986679443496**\n"
-                "------------------------------------------------------------\n"
-                "**UltraSpeaker Express\n**
-                "- The First Speaker\n"
-                "**Ultra Gramiel Express\n** 
-                "- Ultra Gramiel\n"
-                "**Daily 4-Man Express\n** 
-                "- Daily 4-Man Ultra Bosses\n"
-                "**Daily 7-Man Express\n**
-                "- Daily 7-Man Ultra Bosses\n"
-                "**Weekly Ultra Express\n** 
-                "- Weekly Ultra Bosses (excluding speaker, grim and gramiel)\n"
-                "**GrimChallenge Express\n** 
-                "- Mechabinky & Raxborg 2.0\n"
-                "**Daily Temple Express\n** 
-                "- Daily TempleShrine\n"
-                "-----------------------------------------------------------\n"
-                "# How it works📢\n"
-                "✅ Select a \"ticket type\"\n"
-                "📝 Fill out the form\n"
-                "💁 Helpers join\n"
-                "🎉 Get help in your private ticket"
-            ),
-            color=discord.Color.blue()
-        )
+       embed = discord.Embed(
+    title="🎮 IN-GAME ASSISTANCE 🎮",
+    description="""
+# CHOOSE YOUR TICKET TYPE🚂 💨
+**Pick the ticket type that fits your request📜**
+**⁠https://discord.com/channels/1345073229026562079/1358536986679443496**
+------------------------------------------------------------
+**UltraSpeaker Express**
+- The First Speaker
+**Ultra Gramiel Express**
+- Ultra Gramiel
+**Daily 4-Man Express**
+- Daily 4-Man Ultra Bosses
+**Daily 7-Man Express**
+- Daily 7-Man Ultra Bosses
+**Weekly Ultra Express**
+- Weekly Ultra Bosses (excluding speaker, grim and gramiel)
+**GrimChallenge Express**
+- Mechabinky & Raxborg 2.0
+**Daily Temple Express**
+- Daily TempleShrine
+-----------------------------------------------------------
+# How it works📢
+✅ Select a "ticket type"
+📝 Fill out the form
+💁 Helpers join
+🎉 Get help in your private ticket
+""",
+    color=discord.Color.blue()
+)
+
 
         view = TicketButtonView()
         await interaction.response.send_message(embed=embed, view=view, ephemeral=False)
