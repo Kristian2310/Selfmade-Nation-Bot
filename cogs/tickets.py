@@ -5,15 +5,30 @@ import aiosqlite
 
 DB_PATH = "database/bot.db"
 
-TICKET_POINTS = {
-    "Ultra Speaker Express": 8,
-    "Ultra Gramiel Express": 7,
-    "4-Man Ultra Daily Express": 4,
-    "7-Man Ultra Daily Express": 10,
-    "Ultra Weekly Express": 12,
-    "Grim Express": 10,
-    "Daily Temple Express": 6
-}
+TICKET_TYPES = [
+    "UltraSpeaker Express",
+    "Ultra Gramiel Express",
+    "Daily 4-Man Express",
+    "Daily 7-Man Express",
+    "Weekly Ultra Express",
+    "GrimChallenge Express",
+    "Daily Temple Express"
+]
+
+class TicketButton(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)  # Persistent buttons
+
+        for ticket in TICKET_TYPES:
+            self.add_item(discord.ui.Button(label=ticket, style=discord.ButtonStyle.primary, custom_id=f"ticket_{ticket}"))
+
+    @discord.ui.button(label="Test", style=discord.ButtonStyle.green, custom_id="dummy_button")
+    async def dummy(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass  # Placeholder for class init
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        # Optional: you can restrict who can press buttons
+        return True
 
 class Tickets(commands.Cog):
     def __init__(self, bot):
@@ -27,74 +42,70 @@ class Tickets(commands.Cog):
             )
             await db.commit()
 
-    async def get_config(self, key: str):
-        async with aiosqlite.connect(DB_PATH) as db:
-            cursor = await db.execute("SELECT value FROM configs WHERE key = ?", (key,))
-            row = await cursor.fetchone()
-            return row[0] if row else None
-
-    @app_commands.command(name="panel", description="Post ticket panel (Admin/Staff only)")
+    @app_commands.command(name="panel", description="Post the in-game assistance ticket panel")
     async def panel(self, interaction: discord.Interaction):
         if not interaction.user.guild_permissions.manage_channels:
             return await interaction.response.send_message("You can't do this!", ephemeral=True)
-        title = await self.get_config("panel_title") or "🎫 Support Tickets"
-        color_hex = await self.get_config("panel_color") or "#00FF00"
-        embed = discord.Embed(
-            title=title,
-            description="\n".join([f"**{k}** — {v} pts" for k,v in TICKET_POINTS.items()]),
-            color=discord.Color(int(color_hex.replace("#",""),16))
-        )
-        message = await interaction.channel.send(embed=embed)
-        await message.add_reaction("🎟️")
-        await interaction.response.send_message("Ticket panel posted!", ephemeral=True)
 
-    @app_commands.command(name="verification_panel", description="Post verification panel (Admin only)")
-    async def verification_panel(self, interaction: discord.Interaction):
-        if not interaction.user.guild_permissions.manage_channels:
-            return await interaction.response.send_message("You can't do this!", ephemeral=True)
         embed = discord.Embed(
-            title="✅ Verification Panel",
-            description="React with ✅ to verify yourself",
+            title="🎮 IN-GAME ASSISTANCE 🎮",
+            description=(
+                "CHOOSE YOUR TICKET TYPE🚂 💨\n"
+                "Pick the ticket type that fits your request📜\n"
+                "⁠🎫📄︱𝙏𝙞𝙘𝙠𝙚𝙩-𝘿𝙚𝙨𝙘𝙧𝙞𝙥𝙩𝙞𝙤𝙣𝙨…\n"
+                "------------------------------------------------------------\n"
+                "UltraSpeaker Express — The First Speaker\n"
+                "Ultra Gramiel Express — Ultra Gramiel\n"
+                "Daily 4-Man Express — Daily 4-Man Ultra Bosses\n"
+                "Daily 7-Man Express — Daily 7-Man Ultra Bosses\n"
+                "Weekly Ultra Express — Weekly Ultra Bosses (excluding speaker, grim and gramiel)\n"
+                "GrimChallenge Express — Mechabinky & Raxborg 2.0\n"
+                "Daily Temple Express — Daily TempleShrine\n"
+                "-----------------------------------------------------------\n"
+                "How it works📢\n"
+                "✅ Select a \"ticket type\"\n"
+                "📝 Fill out the form\n"
+                "💁 Helpers join\n"
+                "🎉 Get help in your private ticket"
+            ),
             color=discord.Color.blue()
         )
-        message = await interaction.channel.send(embed=embed)
-        await message.add_reaction("✅")
-        await interaction.response.send_message("Verification panel posted!", ephemeral=True)
+
+        view = TicketButton()
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=False)
 
     @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
-        if payload.user_id == self.bot.user.id:
-            return
-        guild = self.bot.get_guild(payload.guild_id)
-        member = guild.get_member(payload.user_id)
-        channel = guild.get_channel(payload.channel_id)
-
-        # Maintenance check
-        maintenance = await self.get_config("maintenance_mode")
-        if maintenance == "True":
+    async def on_interaction(self, interaction: discord.Interaction):
+        if interaction.type != discord.InteractionType.component:
             return
 
-        if str(payload.emoji) == "🎟️":
-            category_id = await self.get_config("ticket_category")
-            category = guild.get_channel(int(category_id)) if category_id else None
+        custom_id = interaction.data.get("custom_id")
+        if custom_id and custom_id.startswith("ticket_"):
+            ticket_type = custom_id.replace("ticket_", "")
+            guild = interaction.guild
+            member = interaction.user
+
+            # Optional: Get parent category from your config table
+            async with aiosqlite.connect(DB_PATH) as db:
+                cursor = await db.execute("SELECT value FROM configs WHERE key='ticket_category'")
+                row = await cursor.fetchone()
+                category = guild.get_channel(int(row[0])) if row else None
+
             overwrites = {
                 guild.default_role: discord.PermissionOverwrite(read_messages=False),
                 member: discord.PermissionOverwrite(read_messages=True, send_messages=True)
             }
+
             ticket_channel = await guild.create_text_channel(
                 name=f"ticket-{member.name}",
                 category=category,
                 overwrites=overwrites
             )
-            await ticket_channel.send(f"{member.mention}, your ticket has been created!")
-            await self.add_ticket(member.id, ticket_channel.id, "Custom Ticket")
 
-        if str(payload.emoji) == "✅":
-            role_id = await self.get_config("role_verified")
-            role = guild.get_role(int(role_id)) if role_id else None
-            if role:
-                await member.add_roles(role)
-                await channel.send(f"{member.mention} has been verified!")
+            await self.add_ticket(member.id, ticket_channel.id, ticket_type)
+            await ticket_channel.send(f"{member.mention}, your ticket **{ticket_type}** has been created!")
+            await interaction.response.send_message(f"Ticket created: {ticket_channel.mention}", ephemeral=True)
+
 
 async def setup(bot):
     await bot.add_cog(Tickets(bot))
