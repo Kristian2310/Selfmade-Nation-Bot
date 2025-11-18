@@ -70,7 +70,7 @@ class Tickets(commands.Cog):
                 "**GrimChallenge Express\n** 
                 "- Mechabinky & Raxborg 2.0\n"
                 "**Daily Temple Express\n** 
-                - "Daily TempleShrine\n"
+                "- Daily TempleShrine\n"
                 "-----------------------------------------------------------\n"
                 "# How it works📢\n"
                 "✅ Select a \"ticket type\"\n"
