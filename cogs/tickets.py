@@ -53,19 +53,26 @@ class Tickets(commands.Cog):
         embed = discord.Embed(
             title="🎮 IN-GAME ASSISTANCE 🎮",
             description=(
-                "CHOOSE YOUR TICKET TYPE🚂 💨\n"
-                "Pick the ticket type that fits your request📜\n"
-                "⁠🎫📄︱𝙏𝙞𝙘𝙠𝙚𝙩-𝘿𝙚𝙨𝙘𝙧𝙞𝙥𝙩𝙞𝙤𝙣𝙨…\n"
+                "# CHOOSE YOUR TICKET TYPE🚂 💨\n"
+                "**Pick the ticket type that fits your request📜\n**"
+                "**⁠https://discord.com/channels/1345073229026562079/1358536986679443496**\n"
                 "------------------------------------------------------------\n"
-                "UltraSpeaker Express — The First Speaker\n"
-                "Ultra Gramiel Express — Ultra Gramiel\n"
-                "Daily 4-Man Express — Daily 4-Man Ultra Bosses\n"
-                "Daily 7-Man Express — Daily 7-Man Ultra Bosses\n"
-                "Weekly Ultra Express — Weekly Ultra Bosses (excluding speaker, grim and gramiel)\n"
-                "GrimChallenge Express — Mechabinky & Raxborg 2.0\n"
-                "Daily Temple Express — Daily TempleShrine\n"
+                "**UltraSpeaker Express\n**
+                "- The First Speaker\n"
+                "**Ultra Gramiel Express\n** 
+                "- Ultra Gramiel\n"
+                "**Daily 4-Man Express\n** 
+                "- Daily 4-Man Ultra Bosses\n"
+                "**Daily 7-Man Express\n**
+                "- Daily 7-Man Ultra Bosses\n"
+                "**Weekly Ultra Express\n** 
+                "- Weekly Ultra Bosses (excluding speaker, grim and gramiel)\n"
+                "**GrimChallenge Express\n** 
+                "- Mechabinky & Raxborg 2.0\n"
+                "**Daily Temple Express\n** 
+                - "Daily TempleShrine\n"
                 "-----------------------------------------------------------\n"
-                "How it works📢\n"
+                "# How it works📢\n"
                 "✅ Select a \"ticket type\"\n"
                 "📝 Fill out the form\n"
                 "💁 Helpers join\n"
